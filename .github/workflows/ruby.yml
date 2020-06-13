@@ -1,0 +1,25 @@
+#initialise the number of weeks for the dataset
+num_weeks = 10
+
+#initialise the date for the first week of the dataset (week ending on start_date)
+start_date = filedate = pd.Timestamp('2019-02-02 00:00:00')
+
+#initialise the regex for the MTA turnstile url
+filename_regex = "http://web.mta.info/developers/data/nyct/turnstile/turnstile_{}.txt"
+
+filelist = []
+
+for numfiles in range (num_weeks):
+
+    # create the appropriate filename for the week
+    filedate_str = str(filedate.year)[2:4] + str(filedate.month).zfill(2) + str(filedate.day).zfill(2)
+    filename = filename_regex.format(filedate_str)
+
+    # read the file and append it to the list of files to be concacated
+    df = pd.read_csv(filename, parse_dates=['DATE'], keep_date_col=True)
+    filelist.append(df)
+
+    # advance to the next week
+    filedate += pd.Timedelta(days=7)
+
+mta_test = pd.concat(filelist, axis=0, ignore_index=True)
